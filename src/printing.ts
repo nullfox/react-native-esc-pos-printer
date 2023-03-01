@@ -9,6 +9,7 @@ import {
 import {
   PRINTING_ALIGNMENT,
   PRINTING_COMMANDS,
+  FONTS,
   EPOS_BOOLEANS,
   BARCODE_TYPE,
   BARCODE_HRI,
@@ -40,6 +41,7 @@ const printEventEmmiter = new NativeEventEmitter(EscPosPrinter);
 
 type TCommandValue = [string, any[]];
 type TScalingFactors = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type TFont = keyof typeof FONTS;
 
 /**
  * Create an array of commands to send to the printer
@@ -211,6 +213,32 @@ class Printing {
   line(value: string) {
     this.text(value);
     this.newline();
+
+    return this;
+  }
+
+  /**
+   * Line space
+   *
+   * @param  {number}   value  Line space in dots 0-255
+   * @return {object}          Return the object, for easy chaining commands
+   *
+   */
+  linespace(value: number) {
+    this._queue([PRINTING_COMMANDS.COMMAND_ADD_LINE_SPACE, [value]]);
+
+    return this;
+  }
+
+  /**
+   * Line space
+   *
+   * @param  {number}   value  Line space in dots 0-255
+   * @return {object}          Return the object, for easy chaining commands
+   *
+   */
+  font(value: TFont) {
+    this._queue([PRINTING_COMMANDS.COMMAND_ADD_TEXT_FONT, [value]]);
 
     return this;
   }

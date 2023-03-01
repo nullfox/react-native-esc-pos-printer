@@ -58,6 +58,8 @@ class PrintingCommands {
   public static final int COMMAND_ADD_QRCODE = 11;
   public static final int COMMAND_ADD_IMAGE = 12;
   public static final int COMMAND_ADD_PULSE = 13;
+  public static final int COMMAND_ADD_TEXT_FONT = 14;
+  public static final int COMMAND_ADD_LINE_SPACE = 15;
 }
 
 @ReactModule(name = EscPosPrinterModule.NAME)
@@ -137,6 +139,8 @@ public class EscPosPrinterModule extends ReactContextBaseJavaModule implements R
       constants.put("COMMAND_ADD_CUT", PrintingCommands.COMMAND_ADD_CUT);
       constants.put("COMMAND_ADD_DATA", PrintingCommands.COMMAND_ADD_DATA);
       constants.put("COMMAND_ADD_PULSE", PrintingCommands.COMMAND_ADD_PULSE);
+      constants.put("COMMAND_ADD_TEXT_FONT", PrintingCommands.COMMAND_ADD_TEXT_FONT);
+      constants.put("COMMAND_ADD_LINE_SPACE", PrintingCommands.COMMAND_ADD_LINE_SPACE);
 
       constants.put("EPOS2_ALIGN_LEFT", Printer.ALIGN_LEFT);
       constants.put("EPOS2_ALIGN_RIGHT", Printer.ALIGN_RIGHT);
@@ -201,6 +205,13 @@ public class EscPosPrinterModule extends ReactContextBaseJavaModule implements R
       // Add pulse settings
       constants.put("EPOS2_DRAWER_2PIN", Printer.DRAWER_2PIN);
       constants.put("EPOS2_DRAWER_5PIN", Printer.DRAWER_5PIN);
+
+      // Fonts
+      constants.put("FONT_A", Printer.FONT_A);
+      constants.put("FONT_B", Printer.FONT_B);
+      constants.put("FONT_C", Printer.FONT_C);
+      constants.put("FONT_D", Printer.FONT_D);
+      constants.put("FONT_E", Printer.FONT_E);
 
       return constants;
     }
@@ -619,6 +630,12 @@ public class EscPosPrinterModule extends ReactContextBaseJavaModule implements R
         break;
       case PrintingCommands.COMMAND_ADD_PULSE:
         mPrinter.addPulse(params.getInt(0), Printer.PARAM_DEFAULT);
+        break;
+      case PrintingCommands.COMMAND_ADD_TEXT_FONT:
+        mPrinter.addTextFont(params.getInt(0));
+        break;
+      case PrintingCommands.COMMAND_ADD_LINE_SPACE:
+        mPrinter.addLineSpace(params.getInt(0));
         break;
       case PrintingCommands.COMMAND_ADD_NEW_LINE:
         mPrinter.addFeedLine(params.getInt(0));
