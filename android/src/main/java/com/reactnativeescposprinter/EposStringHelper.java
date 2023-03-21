@@ -33,7 +33,6 @@ public class EposStringHelper {
         String batteryLevel = "";
         String paperWait = "";
 
-
         switch (statusInfo.getConnection()) {
             case Printer.TRUE:
                 connection = "CONNECT";
@@ -123,11 +122,11 @@ public class EposStringHelper {
 
         switch (statusInfo.getDrawer()) {
             case Printer.DRAWER_HIGH:
-                //This status depends on the drawer setting.
+                // This status depends on the drawer setting.
                 drawer = "DRAWER_HIGH(Drawer close)";
                 break;
             case Printer.DRAWER_LOW:
-                //This status depends on the drawer setting.
+                // This status depends on the drawer setting.
                 drawer = "DRAWER_LOW(Drawer open)";
                 break;
             case Printer.UNKNOWN:
@@ -227,10 +226,10 @@ public class EposStringHelper {
         }
 
         switch (statusInfo.getRemovalWaiting()) {
-            case Printer.EVENT_REMOVAL_WAIT_PAPER:
+            case Printer.REMOVAL_WAIT_PAPER:
                 paperWait = "WAITING_FOR_PAPER_REMOVAL";
                 break;
-            case Printer.EVENT_REMOVAL_WAIT_NONE:
+            case Printer.REMOVAL_WAIT_NONE:
                 paperWait = "NOT_WAITING_FOR_PAPER_REMOVAL";
                 break;
             case Printer.UNKNOWN:
@@ -243,17 +242,17 @@ public class EposStringHelper {
         JSONObject jsonStatus = new JSONObject();
         try {
             jsonStatus.put("connection", connection);
-            jsonStatus.put("online",online);
-            jsonStatus.put("coverOpen",coverOpen);
-            jsonStatus.put("paper",paper);
-            jsonStatus.put("paperFeed",paperFeed);
-            jsonStatus.put("panelSwitch",panelSwitch);
-            jsonStatus.put("drawer",drawer);
-            jsonStatus.put("errorStatus",errorStatus);
-            jsonStatus.put("autoRecoverErr",autoRecoverErr);
-            jsonStatus.put("adapter",adapter);
-            jsonStatus.put("batteryLevel",batteryLevel);
-            jsonStatus.put("paperWait",paperWait);
+            jsonStatus.put("online", online);
+            jsonStatus.put("coverOpen", coverOpen);
+            jsonStatus.put("paper", paper);
+            jsonStatus.put("paperFeed", paperFeed);
+            jsonStatus.put("panelSwitch", panelSwitch);
+            jsonStatus.put("drawer", drawer);
+            jsonStatus.put("errorStatus", errorStatus);
+            jsonStatus.put("autoRecoverErr", autoRecoverErr);
+            jsonStatus.put("adapter", adapter);
+            jsonStatus.put("batteryLevel", batteryLevel);
+            jsonStatus.put("paperWait", paperWait);
 
         } catch (JSONException e) {
             // TODO Auto-generated catch block
@@ -327,31 +326,31 @@ public class EposStringHelper {
 
     }
 
-     public static String convertPaperWidthEnum2String(int paperWidthEnum, @NonNull Context context) {
+    public static String convertPaperWidthEnum2String(int paperWidthEnum, @NonNull Context context) {
 
-         String paperWidthStr = "invalid";
-         switch (paperWidthEnum) {
-             case Printer.SETTING_PAPERWIDTH_58_0:
-                 paperWidthStr = "58mm";
-                 break;
-             case Printer.SETTING_PAPERWIDTH_60_0:
-                 paperWidthStr = "60mm";
-                 break;
-             case Printer.SETTING_PAPERWIDTH_70_0:
-                 paperWidthStr = "70mm";
-                 break;
-             case Printer.SETTING_PAPERWIDTH_76_0:
-                 paperWidthStr = "76mm";
-                 break;
-             case Printer.SETTING_PAPERWIDTH_80_0:
-                 paperWidthStr = "80mm";
-                 break;
-             default:
-                 break;
-         }
+        String paperWidthStr = "invalid";
+        switch (paperWidthEnum) {
+            case Printer.SETTING_PAPERWIDTH_58_0:
+                paperWidthStr = "58mm";
+                break;
+            case Printer.SETTING_PAPERWIDTH_60_0:
+                paperWidthStr = "60mm";
+                break;
+            case Printer.SETTING_PAPERWIDTH_70_0:
+                paperWidthStr = "70mm";
+                break;
+            case Printer.SETTING_PAPERWIDTH_76_0:
+                paperWidthStr = "76mm";
+                break;
+            case Printer.SETTING_PAPERWIDTH_80_0:
+                paperWidthStr = "80mm";
+                break;
+            default:
+                break;
+        }
 
-         return paperWidthStr;
-     }
+        return paperWidthStr;
+    }
 
     public static String convertPrintDensityEnum2String(int densityEnum, @NonNull Context context) {
         String deinsityStr = "invalid";
@@ -405,92 +404,90 @@ public class EposStringHelper {
         return deinsityStr;
     }
 
+    public static String convertEpos2PrinterSettingTypeEnum2String(int printerSettingTypeEnum) {
 
-     public static String convertEpos2PrinterSettingTypeEnum2String(int printerSettingTypeEnum) {
+        String printerSettingTypeStr = "invalid";
+        switch (printerSettingTypeEnum) {
+            case Printer.SETTING_PAPERWIDTH:
+                printerSettingTypeStr = "SETTING_PAPERWIDTH";
+                break;
+            case Printer.SETTING_PRINTDENSITY:
+                printerSettingTypeStr = "SETTING_PRINTDENSITY";
+                break;
+            case Printer.SETTING_PRINTSPEED:
+                printerSettingTypeStr = "SETTING_PRINTSPEED";
+                break;
+            default:
+                break;
+        }
 
-         String printerSettingTypeStr = "invalid";
-         switch (printerSettingTypeEnum) {
-             case Printer.SETTING_PAPERWIDTH:
-                 printerSettingTypeStr = "SETTING_PAPERWIDTH";
-                 break;
-             case Printer.SETTING_PRINTDENSITY:
-                 printerSettingTypeStr = "SETTING_PRINTDENSITY";
-                 break;
-             case Printer.SETTING_PRINTSPEED:
-                 printerSettingTypeStr = "SETTING_PRINTSPEED";
-                 break;
-             default:
-                 break;
-         }
+        return printerSettingTypeStr;
 
-         return printerSettingTypeStr;
+    }
 
-     }
+    public static String makeStatusMonitorMessage(int type) {
+        String msg = "";
 
-
-     public static String makeStatusMonitorMessage(int type) {
-         String msg = "";
-
-         switch (type) {
-             case Printer.EVENT_ONLINE:
-                 msg += "ONLINE";
-                 break;
-             case Printer.EVENT_OFFLINE:
-                 msg += "OFFLINE";
-                 break;
-             case Printer.EVENT_POWER_OFF:
-                 msg += "POWER_OFF";
-                 break;
-             case Printer.EVENT_COVER_CLOSE:
-                 msg += "COVER_CLOSE";
-                 break;
-             case Printer.EVENT_COVER_OPEN:
-                 msg += "COVER_OPEN";
-                 break;
-             case Printer.EVENT_PAPER_OK:
-                 msg += "PAPER_OK";
-                 break;
-             case Printer.EVENT_PAPER_NEAR_END:
-                 msg += "PAPER_NEAR_END";
-                 break;
-             case Printer.EVENT_PAPER_EMPTY:
-                 msg += "PAPER_EMPTY";
-                 break;
-             case Printer.EVENT_DRAWER_HIGH:
-                 //This status depends on the drawer setting.
-                 msg += "DRAWER_HIGH(Drawer close)";
-                 break;
-             case Printer.EVENT_DRAWER_LOW:
-                 //This status depends on the drawer setting.
-                 msg += "DRAWER_LOW(Drawer open)";
-                 break;
-             case Printer.EVENT_BATTERY_ENOUGH:
-                 msg += "BATTERY_ENOUGH";
-                 break;
-             case Printer.EVENT_BATTERY_EMPTY:
-                 msg += "BATTERY_EMPTY";
-                 break;
-             case Printer.EVENT_REMOVAL_WAIT_PAPER:
-                 msg += "WAITING_FOR_PAPER_REMOVAL";
-                 break;
-             case Printer.EVENT_REMOVAL_WAIT_NONE:
-                 msg += "NOT_WAITING_FOR_PAPER_REMOVAL";
-                 break;
-             case Printer.EVENT_AUTO_RECOVER_ERROR:
-                 msg += "AUTO_RECOVER_ERROR";
-                 break;
-             case Printer.EVENT_AUTO_RECOVER_OK:
-                 msg += "AUTO_RECOVER_OK";
-                 break;
-             case Printer.EVENT_UNRECOVERABLE_ERROR:
-                 msg += "UNRECOVERABLE_ERROR";
-                 break;
-             default:
-                 break;
-         }
-         msg += "\n";
-         return msg;
-     }
+        switch (type) {
+            case Printer.EVENT_ONLINE:
+                msg += "ONLINE";
+                break;
+            case Printer.EVENT_OFFLINE:
+                msg += "OFFLINE";
+                break;
+            case Printer.EVENT_POWER_OFF:
+                msg += "POWER_OFF";
+                break;
+            case Printer.EVENT_COVER_CLOSE:
+                msg += "COVER_CLOSE";
+                break;
+            case Printer.EVENT_COVER_OPEN:
+                msg += "COVER_OPEN";
+                break;
+            case Printer.EVENT_PAPER_OK:
+                msg += "PAPER_OK";
+                break;
+            case Printer.EVENT_PAPER_NEAR_END:
+                msg += "PAPER_NEAR_END";
+                break;
+            case Printer.EVENT_PAPER_EMPTY:
+                msg += "PAPER_EMPTY";
+                break;
+            case Printer.EVENT_DRAWER_HIGH:
+                // This status depends on the drawer setting.
+                msg += "DRAWER_HIGH(Drawer close)";
+                break;
+            case Printer.EVENT_DRAWER_LOW:
+                // This status depends on the drawer setting.
+                msg += "DRAWER_LOW(Drawer open)";
+                break;
+            case Printer.EVENT_BATTERY_ENOUGH:
+                msg += "BATTERY_ENOUGH";
+                break;
+            case Printer.EVENT_BATTERY_EMPTY:
+                msg += "BATTERY_EMPTY";
+                break;
+            case Printer.EVENT_REMOVAL_WAIT_PAPER:
+                msg += "WAITING_FOR_PAPER_REMOVAL";
+                break;
+            case Printer.EVENT_REMOVAL_WAIT_NONE:
+                msg += "NOT_WAITING_FOR_PAPER_REMOVAL";
+                break;
+            case Printer.EVENT_AUTO_RECOVER_ERROR:
+                msg += "AUTO_RECOVER_ERROR";
+                break;
+            case Printer.EVENT_AUTO_RECOVER_OK:
+                msg += "AUTO_RECOVER_OK";
+                break;
+            case Printer.EVENT_UNRECOVERABLE_ERROR:
+                msg += "UNRECOVERABLE_ERROR";
+                break;
+            default:
+                break;
+        }
+        msg += "\n";
+        return msg;
+    }
 
     public static String getEposExceptionText(int state) {
         String return_text = "";
@@ -498,52 +495,52 @@ public class EposStringHelper {
             case POS_SUCCESS:
                 return_text = "SUCCESS";
                 break;
-            case    Epos2Exception.ERR_PARAM:
+            case Epos2Exception.ERR_PARAM:
                 return_text = "ERR_PARAM";
                 break;
-            case    Epos2Exception.ERR_CONNECT:
+            case Epos2Exception.ERR_CONNECT:
                 return_text = "ERR_CONNECT";
                 break;
-            case    Epos2Exception.ERR_TIMEOUT:
+            case Epos2Exception.ERR_TIMEOUT:
                 return_text = "ERR_TIMEOUT";
                 break;
-            case    Epos2Exception.ERR_MEMORY:
+            case Epos2Exception.ERR_MEMORY:
                 return_text = "ERR_MEMORY";
                 break;
-            case    Epos2Exception.ERR_ILLEGAL:
+            case Epos2Exception.ERR_ILLEGAL:
                 return_text = "ERR_ILLEGAL";
                 break;
-            case    Epos2Exception.ERR_PROCESSING:
+            case Epos2Exception.ERR_PROCESSING:
                 return_text = "ERR_PROCESSING";
                 break;
-            case    Epos2Exception.ERR_NOT_FOUND:
+            case Epos2Exception.ERR_NOT_FOUND:
                 return_text = "ERR_NOT_FOUND";
                 break;
-            case    Epos2Exception.ERR_IN_USE:
+            case Epos2Exception.ERR_IN_USE:
                 return_text = "ERR_IN_USE";
                 break;
-            case    Epos2Exception.ERR_TYPE_INVALID:
+            case Epos2Exception.ERR_TYPE_INVALID:
                 return_text = "ERR_TYPE_INVALID";
                 break;
-            case    Epos2Exception.ERR_DISCONNECT:
+            case Epos2Exception.ERR_DISCONNECT:
                 return_text = "ERR_DISCONNECT";
                 break;
-            case    Epos2Exception.ERR_ALREADY_OPENED:
+            case Epos2Exception.ERR_ALREADY_OPENED:
                 return_text = "ERR_ALREADY_OPENED";
                 break;
-            case    Epos2Exception.ERR_ALREADY_USED:
+            case Epos2Exception.ERR_ALREADY_USED:
                 return_text = "ERR_ALREADY_USED";
                 break;
-            case    Epos2Exception.ERR_BOX_COUNT_OVER:
+            case Epos2Exception.ERR_BOX_COUNT_OVER:
                 return_text = "ERR_BOX_COUNT_OVER";
                 break;
-            case    Epos2Exception.ERR_BOX_CLIENT_OVER:
+            case Epos2Exception.ERR_BOX_CLIENT_OVER:
                 return_text = "ERR_BOX_CLIENT_OVER";
                 break;
-            case    Epos2Exception.ERR_UNSUPPORTED:
+            case Epos2Exception.ERR_UNSUPPORTED:
                 return_text = "ERR_UNSUPPORTED";
                 break;
-            case    Epos2Exception.ERR_FAILURE:
+            case Epos2Exception.ERR_FAILURE:
                 return_text = "ERR_FAILURE";
                 break;
             default:
@@ -697,35 +694,63 @@ public class EposStringHelper {
 
     public static int getPrinterSeries(final String deviceName) {
 
-        if (deviceName == null || deviceName.isEmpty()) return Printer.TM_T88;
+        if (deviceName == null || deviceName.isEmpty())
+            return Printer.TM_T88;
 
-        if (deviceName.startsWith("TM-T88VII")) return Printer.TM_T88VII;
-        if (deviceName.startsWith("TM-m30II")) return Printer.TM_M30II;
-        if (deviceName.startsWith("TM-m30")) return Printer.TM_M30;
-        if (deviceName.startsWith("TM-L90LFC")) return Printer.TM_L90LFC;
-        if (deviceName.startsWith("TM-L90")) return Printer.TM_L90;
-        if (deviceName.startsWith("TM-m50")) return Printer.TM_M50;
-        if (deviceName.startsWith("TM-L100")) return Printer.TM_L100;
-        if (deviceName.startsWith("TM-m10")) return Printer.TM_M10;
-        if (deviceName.startsWith("TM-P20")) return Printer.TM_P20;
-        if (deviceName.startsWith("TM-P60II")) return Printer.TM_P60II;
-        if (deviceName.startsWith("TM-P60")) return Printer.TM_P60;
-        if (deviceName.startsWith("TM-P80")) return Printer.TM_P80;
-        if (deviceName.startsWith("TM-T20")) return Printer.TM_T20;
-        if (deviceName.startsWith("TM-T60")) return Printer.TM_T60;
-        if (deviceName.startsWith("TM-T70")) return Printer.TM_T70;
-        if (deviceName.startsWith("TM-T81")) return Printer.TM_T81;
-        if (deviceName.startsWith("TM-T82")) return Printer.TM_T82;
-        if (deviceName.startsWith("TM-T83III")) return Printer.TM_T83III;
-        if (deviceName.startsWith("TM-T83")) return Printer.TM_T83;
-        if (deviceName.startsWith("TM-T88")) return Printer.TM_T88;
-        if (deviceName.startsWith("TM-T90KP")) return Printer.TM_T90KP;
-        if (deviceName.startsWith("TM-T90")) return Printer.TM_T90;
-        if (deviceName.startsWith("TM-U220")) return Printer.TM_U220;
-        if (deviceName.startsWith("TM-U330")) return Printer.TM_U330;
-        if (deviceName.startsWith("TM-H6000")) return Printer.TM_H6000;
-        if (deviceName.startsWith("TM-T100")) return Printer.TM_T100;
-        if (deviceName.startsWith("TS-100")) return Printer.TS_100;
+        if (deviceName.startsWith("TM-T88VII"))
+            return Printer.TM_T88VII;
+        if (deviceName.startsWith("TM-m30II"))
+            return Printer.TM_M30II;
+        if (deviceName.startsWith("TM-m30"))
+            return Printer.TM_M30;
+        if (deviceName.startsWith("TM-L90LFC"))
+            return Printer.TM_L90LFC;
+        if (deviceName.startsWith("TM-L90"))
+            return Printer.TM_L90;
+        if (deviceName.startsWith("TM-m50"))
+            return Printer.TM_M50;
+        if (deviceName.startsWith("TM-L100"))
+            return Printer.TM_L100;
+        if (deviceName.startsWith("TM-m10"))
+            return Printer.TM_M10;
+        if (deviceName.startsWith("TM-P20"))
+            return Printer.TM_P20;
+        if (deviceName.startsWith("TM-P60II"))
+            return Printer.TM_P60II;
+        if (deviceName.startsWith("TM-P60"))
+            return Printer.TM_P60;
+        if (deviceName.startsWith("TM-P80"))
+            return Printer.TM_P80;
+        if (deviceName.startsWith("TM-T20"))
+            return Printer.TM_T20;
+        if (deviceName.startsWith("TM-T60"))
+            return Printer.TM_T60;
+        if (deviceName.startsWith("TM-T70"))
+            return Printer.TM_T70;
+        if (deviceName.startsWith("TM-T81"))
+            return Printer.TM_T81;
+        if (deviceName.startsWith("TM-T82"))
+            return Printer.TM_T82;
+        if (deviceName.startsWith("TM-T83III"))
+            return Printer.TM_T83III;
+        if (deviceName.startsWith("TM-T83"))
+            return Printer.TM_T83;
+        if (deviceName.startsWith("TM-T88"))
+            return Printer.TM_T88;
+        if (deviceName.startsWith("TM-T90KP"))
+            return Printer.TM_T90KP;
+        if (deviceName.startsWith("TM-T90"))
+            return Printer.TM_T90;
+        if (deviceName.startsWith("TM-U220"))
+            return Printer.TM_U220;
+        if (deviceName.startsWith("TM-U330"))
+            return Printer.TM_U330;
+        if (deviceName.startsWith("TM-H6000"))
+            return Printer.TM_H6000;
+        if (deviceName.startsWith("TM-T100"))
+            return Printer.TM_T100;
+        if (deviceName.startsWith("TS-100"))
+            return Printer.TS_100;
 
         return Printer.TM_T88;
 
