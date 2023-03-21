@@ -129,6 +129,10 @@ export interface IMonitorStatus {
     | 'BATTERY_LEVEL_5'
     | 'BATTERY_LEVEL_6'
     | 'UNKNOWN';
+  paperWait:
+    | 'WAITING_FOR_PAPER_REMOVAL'
+    | 'NOT_WAITING_FOR_PAPER_REMOVAL'
+    | 'UNKNOWN';
 }
 
 export type BarcodeType =
