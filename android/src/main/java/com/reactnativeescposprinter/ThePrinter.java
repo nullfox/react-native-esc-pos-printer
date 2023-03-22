@@ -574,7 +574,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
             printJobId = "";
         }
 
-        Log.e("MYAPP", status.getRemovalWaiting());
+        Log.e("MYAPP", String.valueOf(status.getRemovalWaiting()));
 
         // store result of printing
         JSONObject returnData = new JSONObject();
