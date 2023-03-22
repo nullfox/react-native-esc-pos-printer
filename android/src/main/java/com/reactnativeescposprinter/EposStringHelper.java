@@ -247,9 +247,9 @@ public class EposStringHelper {
                 break;
         }
 
-        Log.e("MYAPP", String.valueOf(statusInfo.getRemovalWaiting()));
-        Log.e("MYAPP", String.valueOf(Printer.REMOVAL_WAIT_PAPER));
-        Log.e("MYAPP", String.valueOf(Printer.REMOVAL_WAIT_NONE));
+        Log.d("RNEscPosPrinter", String.valueOf(statusInfo.getRemovalWaiting()));
+        Log.d("RNEscPosPrinter", String.valueOf(Printer.REMOVAL_WAIT_PAPER));
+        Log.d("RNEscPosPrinter", String.valueOf(Printer.REMOVAL_WAIT_NONE));
 
         JSONObject jsonStatus = new JSONObject();
         try {
