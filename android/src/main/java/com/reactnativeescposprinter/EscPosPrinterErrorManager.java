@@ -1,5 +1,9 @@
 package com.reactnativeescposprinter;
 
+import android.util.Log;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.Epos2CallbackCode;
 import com.epson.epos2.printer.Printer;
@@ -477,6 +481,14 @@ public class EscPosPrinterErrorManager {
         statusMessage.putString("batteryLevel", batteryLevel);
         statusMessage.putString("paperWait", paperWait);
         statusMessage.putString("removalWaiting", String.valueOf(statusInfo.getRemovalWaiting()));
+
+        Logger logger = Logger.getLogger("com.reactnativeescpostprinter.EposStringHelper");
+
+        logger.log(Level.ALL, String.valueOf(statusInfo.getRemovalWaiting()));
+        logger.log(Level.ALL, String.valueOf(Printer.REMOVAL_WAIT_PAPER));
+        logger.log(Level.ALL, String.valueOf(Printer.REMOVAL_WAIT_NONE));
+
+        Log.d("RNEscPosPrinter", String.valueOf(statusInfo.getRemovalWaiting()));
 
         return statusMessage;
     }
