@@ -248,6 +248,8 @@ public class EposStringHelper {
         }
 
         Log.e("MYAPP", String.valueOf(statusInfo.getRemovalWaiting()));
+        Log.e("MYAPP", String.valueOf(Printer.REMOVAL_WAIT_PAPER));
+        Log.e("MYAPP", String.valueOf(Printer.REMOVAL_WAIT_NONE));
 
         JSONObject jsonStatus = new JSONObject();
         try {
@@ -263,6 +265,7 @@ public class EposStringHelper {
             jsonStatus.put("adapter", adapter);
             jsonStatus.put("batteryLevel", batteryLevel);
             jsonStatus.put("paperWait", paperWait);
+            jsonStatus.put("removalWaiting", statusInfo.getRemovalWaiting());
 
         } catch (JSONException e) {
             // TODO Auto-generated catch block

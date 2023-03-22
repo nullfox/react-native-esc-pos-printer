@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 @ReactModule(name = ThePrinterWrapper.NAME)
 public class ThePrinterWrapper extends ReactContextBaseJavaModule implements PrinterDelegate {
 
-    private Context context_ = null;   // Activity object
+    private Context context_ = null; // Activity object
     private final ReactApplicationContext reactContext;
     private ThePrinterManager thePrinterManager_ = ThePrinterManager.getInstance(); // manage the ThePrinter objects
     ExecutorService tasksQueue = Executors.newSingleThreadExecutor();
@@ -50,11 +50,12 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     public static final String NAME = "ThePrinterWrapper";
 
     interface MyCallbackInterface {
-      void onSuccess(String result);
-      void onError(String result);
+        void onSuccess(String result);
+
+        void onError(String result);
     }
 
-    public ThePrinterWrapperDelegate delegate_ = null;  // delegate callback
+    public ThePrinterWrapperDelegate delegate_ = null; // delegate callback
 
     public ThePrinterWrapper(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -68,9 +69,7 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
         return NAME;
     }
 
-
-    private void handleNoObject(final String objectid, final String printerTarget)
-    {
+    private void handleNoObject(final String objectid, final String printerTarget) {
         synchronized (delegateSync_) {
             if (delegate_ != null) {
                 delegate_.onMemoryError(objectid, "NoObject Created for: " + printerTarget);
@@ -85,6 +84,7 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             public void onSuccess(String result) {
                 promise.resolve(result);
             }
+
             @Override
             public void onError(String result) {
                 promise.reject(result);
@@ -106,62 +106,66 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             }
             connectPrinter(target, callback);
         } catch (Exception e) {
-          callback.onError(e.getMessage());
+            callback.onError(e.getMessage());
         }
     }
 
     @ReactMethod
     public void disconnectAndDeallocate(String target, Promise promise) {
-      this.deallocPrinter(target, new MyCallbackInterface() {
-        @Override
-        public void onSuccess(String result) {
-          promise.resolve(result);
-        }
-        @Override
-        public void onError(String result) {
-          promise.reject(result);
-        }
-      });
+        this.deallocPrinter(target, new MyCallbackInterface() {
+            @Override
+            public void onSuccess(String result) {
+                promise.resolve(result);
+            }
+
+            @Override
+            public void onError(String result) {
+                promise.reject(result);
+            }
+        });
     }
+
     /**
-     Function deallocPrinter tries to delete selected printer from memory and disconnect if connected.
-     @param printerTarget the printer target
+     * Function deallocPrinter tries to delete selected printer from memory and
+     * disconnect if connected.
+     * 
+     * @param printerTarget the printer target
      */
     public void deallocPrinter(@NonNull final String printerTarget, MyCallbackInterface callback) {
 
         try {
-          ThePrinter thePrinter = null;
-          synchronized (this) {
+            ThePrinter thePrinter = null;
+            synchronized (this) {
 
-            thePrinter = thePrinterManager_.getObject(printerTarget);
-            if (thePrinter == null) {
-              String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
-              callback.onError(errorString);
+                thePrinter = thePrinterManager_.getObject(printerTarget);
+                if (thePrinter == null) {
+                    String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
+                    callback.onError(errorString);
+                }
+
+                if (thePrinter.isPrinterBusy()) {
+                    String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_IN_USE);
+                    callback.onError(errorString);
+                }
+
+                thePrinter.setBusy(ThePrinterState.PRINTER_REMOVING);
+
+                thePrinter.removeDelegates();
+
+                thePrinterManager_.remove(printerTarget);
             }
 
-            if (thePrinter.isPrinterBusy()) {
-              String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_IN_USE);
-              callback.onError(errorString);
+            thePrinter.shutdown(true);
+
+            try {
+                Thread.sleep(1000); // give time for any callbacks to finish
+            } catch (InterruptedException e) {
+                callback.onError("Interrupted");
             }
-
-            thePrinter.setBusy(ThePrinterState.PRINTER_REMOVING);
-
-            thePrinter.removeDelegates();
-
-            thePrinterManager_.remove(printerTarget);
-          }
-
-          thePrinter.shutdown(true);
-
-          try {
-            Thread.sleep(1000); // give time for any callbacks to finish
-          } catch (InterruptedException e) {
-            callback.onError("Interrupted");
-          }
-          thePrinter = null;
-          callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
+            thePrinter = null;
+            callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
         } catch (Exception e) {
-          callback.onSuccess(e.getMessage());
+            callback.onSuccess(e.getMessage());
         }
     }
 
@@ -172,37 +176,40 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             public void onSuccess(String result) {
                 promise.resolve(result);
             }
+
             @Override
             public void onError(String result) {
                 promise.reject(result);
             }
         });
     }
+
     /**
-     Function connectPrinter tries to connect selected printer
-     @param printerTarget the printer target
+     * Function connectPrinter tries to connect selected printer
+     * 
+     * @param printerTarget the printer target
      */
-    public void connectPrinter(@NonNull String printerTarget, MyCallbackInterface callback)  {
+    public void connectPrinter(@NonNull String printerTarget, MyCallbackInterface callback) {
 
         try {
-          ThePrinter thePrinter = null;
-          synchronized (this) {
-            thePrinter = thePrinterManager_.getObject(printerTarget);
-            if (thePrinter == null) {
-              String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
-              callback.onError(errorString);
+            ThePrinter thePrinter = null;
+            synchronized (this) {
+                thePrinter = thePrinterManager_.getObject(printerTarget);
+                if (thePrinter == null) {
+                    String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
+                    callback.onError(errorString);
+                }
+                thePrinter.setBusy(ThePrinterState.PRINTER_CONNECTING);
             }
-            thePrinter.setBusy(ThePrinterState.PRINTER_CONNECTING);
-          }
-          try {
-            thePrinter.connect(Printer.PARAM_DEFAULT, true);
-            callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
-          } catch (Epos2Exception e) {
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(e.getErrorStatus());
-            callback.onError(errorString);
-          }
+            try {
+                thePrinter.connect(Printer.PARAM_DEFAULT, true);
+                callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
+            } catch (Epos2Exception e) {
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(e.getErrorStatus());
+                callback.onError(errorString);
+            }
         } catch (Exception e) {
-          callback.onError(e.getMessage());
+            callback.onError(e.getMessage());
         }
     }
 
@@ -213,43 +220,46 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             public void onSuccess(String result) {
                 promise.resolve(result);
             }
+
             @Override
             public void onError(String result) {
                 promise.reject(result);
             }
         });
     }
+
     /**
-     Function disconnectPrinter tries to disconnect selected printer
-     @param printerTarget the printer target
+     * Function disconnectPrinter tries to disconnect selected printer
+     * 
+     * @param printerTarget the printer target
      */
-    public void disconnectPrinter(@NonNull final String printerTarget, MyCallbackInterface callback)  {
+    public void disconnectPrinter(@NonNull final String printerTarget, MyCallbackInterface callback) {
 
         try {
-          ThePrinter thePrinter = null;
-          synchronized (this) {
-            thePrinter = thePrinterManager_.getObject(printerTarget);
-            if (thePrinter == null) {
-              String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
-              callback.onError(errorString);
+            ThePrinter thePrinter = null;
+            synchronized (this) {
+                thePrinter = thePrinterManager_.getObject(printerTarget);
+                if (thePrinter == null) {
+                    String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
+                    callback.onError(errorString);
+                }
+
+                if (thePrinter.isPrinterBusy()) {
+                    String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_IN_USE);
+                    callback.onError(errorString);
+                }
+                thePrinter.setBusy(ThePrinterState.PRINTER_DISCONNECTING);
             }
 
-            if (thePrinter.isPrinterBusy()) {
-              String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_IN_USE);
-              callback.onError(errorString);
+            try {
+                thePrinter.disconnect();
+                callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
+            } catch (Epos2Exception e) {
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(e.getErrorStatus());
+                callback.onError(errorString);
             }
-            thePrinter.setBusy(ThePrinterState.PRINTER_DISCONNECTING);
-          }
-
-          try {
-            thePrinter.disconnect();
-            callback.onSuccess(EscPosPrinterErrorManager.getCodeText(POS_SUCCESS));
-          } catch (Epos2Exception e) {
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(e.getErrorStatus());
-            callback.onError(errorString);
-          }
-        } catch(Exception e) {
-          callback.onError(e.getMessage());
+        } catch (Exception e) {
+            callback.onError(e.getMessage());
         }
     }
 
@@ -274,24 +284,25 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
         return thePrinter.isPrinterBusy();
     }
 
-
     /**
-     Returns void
-     Function handleStatusMonitorResult is used to inform the UI that the Status real time monitor has started/stop success/failed
-     please handle in your app
-     @param printerTarget String the object hash key
-     @param method String the method that called function
-     @param hasError boolean if failer has happened will be true
-     @param error String the error message
+     * Returns void
+     * Function handleStatusMonitorResult is used to inform the UI that the Status
+     * real time monitor has started/stop success/failed
+     * please handle in your app
+     * 
+     * @param printerTarget String the object hash key
+     * @param method        String the method that called function
+     * @param hasError      boolean if failer has happened will be true
+     * @param error         String the error message
      */
-    void handleStatusMonitorResult(String printerTarget, String method, boolean hasError, String error)
-    {
+    void handleStatusMonitorResult(String printerTarget, String method, boolean hasError, String error) {
 
         if (method.startsWith("onPrinterStartStatusMonitorResult")) { // Status Monitor Start success/failer
 
-            new Thread (() -> {
+            new Thread(() -> {
                 synchronized (delegateSync_) {
-                    if (delegate_ != null) delegate_.onPrinterStartStatusMonitorResult(printerTarget, hasError, error);
+                    if (delegate_ != null)
+                        delegate_.onPrinterStartStatusMonitorResult(printerTarget, hasError, error);
                 }
             }).start();
 
@@ -299,9 +310,10 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
         }
 
         if (method.startsWith("onPrinterStopStatusMonitorResult")) { // Status Monitor Stop success/failer
-            new Thread (() -> {
+            new Thread(() -> {
                 synchronized (delegateSync_) {
-                    if (delegate_ != null) delegate_.onPrinterStopStatusMonitorResult(printerTarget, hasError, error);
+                    if (delegate_ != null)
+                        delegate_.onPrinterStopStatusMonitorResult(printerTarget, hasError, error);
                 }
             }).start();
         }
@@ -309,14 +321,16 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     // region Printer Object API
     /**
-     Returns ePOS result int
-     @param printerTarget the printer target
-     @return int ePOS result
+     * Returns ePOS result int
+     * 
+     * @param printerTarget the printer target
+     * @return int ePOS result
      */
     synchronized public int beginTransaction(@NonNull final String printerTarget) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-       if (thePrinter == null)  return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             thePrinter.beginTransaction();
@@ -329,13 +343,15 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     }
 
-    synchronized public int addTextAlign(@NonNull final String printerTarget, final int align)  {
+    synchronized public int addTextAlign(@NonNull final String printerTarget, final int align) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addTextAlign(align);
@@ -348,13 +364,58 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     }
 
-    synchronized public int addImage(@NonNull final String printerTarget, @NonNull Bitmap data, int x, int y, int width, int height, int color, int mode, int halftone, double brightness, int compress) {
+    synchronized public int addTextFont(@NonNull final String printerTarget, final int font) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
+
+        try {
+            printer.addTextFont(font);
+        } catch (Epos2Exception e) {
+            e.printStackTrace();
+            return ((Epos2Exception) e).getErrorStatus();
+        }
+
+        return POS_SUCCESS;
+
+    }
+
+    synchronized public int addLineSpace(@NonNull final String printerTarget, final int space) {
+
+        ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
+
+        Printer printer = thePrinter.getEpos2Printer();
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
+
+        try {
+            printer.addLineSpace(space);
+        } catch (Epos2Exception e) {
+            e.printStackTrace();
+            return ((Epos2Exception) e).getErrorStatus();
+        }
+
+        return POS_SUCCESS;
+
+    }
+
+    synchronized public int addImage(@NonNull final String printerTarget, @NonNull Bitmap data, int x, int y, int width,
+            int height, int color, int mode, int halftone, double brightness, int compress) {
+
+        ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
+
+        Printer printer = thePrinter.getEpos2Printer();
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addImage(data, x, y, width, height, color, mode, halftone, brightness, compress);
@@ -370,10 +431,12 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     synchronized public int addFeedLine(@NonNull final String printerTarget, int line) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addFeedLine(line);
@@ -386,12 +449,14 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     }
 
-    synchronized public int addText(@NonNull final String printerTarget, @NonNull String data)  {
+    synchronized public int addText(@NonNull final String printerTarget, @NonNull String data) {
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addText(data);
@@ -406,10 +471,12 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     synchronized public int addTextSize(@NonNull final String printerTarget, int width, int height) {
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addTextSize(width, height);
@@ -421,13 +488,16 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
         return POS_SUCCESS;
     }
 
-    synchronized public int addBarcode(@NonNull final String printerTarget, String data, int type, int hri, int font, int width, int height)  {
+    synchronized public int addBarcode(@NonNull final String printerTarget, String data, int type, int hri, int font,
+            int width, int height) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addBarcode(data, type, hri, font, width, height);
@@ -443,10 +513,12 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     synchronized public int addCut(@NonNull final String printerTarget, int type) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             printer.addCut(type);
@@ -458,22 +530,25 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
         return POS_SUCCESS;
     }
 
-    synchronized public int clearCommandBuffer(@NonNull final String printerTarget)  {
+    synchronized public int clearCommandBuffer(@NonNull final String printerTarget) {
 
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         printer.clearCommandBuffer();
 
         return POS_SUCCESS;
     }
 
-    synchronized public int endTransaction(@NonNull final String printerTarget)  {
+    synchronized public int endTransaction(@NonNull final String printerTarget) {
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             thePrinter.endTransaction();
@@ -493,20 +568,23 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
         synchronized (this) {
             ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-            if (thePrinter == null) return dummyInfo;
+            if (thePrinter == null)
+                return dummyInfo;
 
             eposPrinter = thePrinter.getEpos2Printer();
 
-            if (eposPrinter == null) return dummyInfo;
+            if (eposPrinter == null)
+                return dummyInfo;
         }
 
         return eposPrinter.getStatus();
 
     }
 
-    synchronized public int getPrinterSetting(@NonNull final String printerTarget, int timeout, int type)  {
+    synchronized public int getPrinterSetting(@NonNull final String printerTarget, int timeout, int type) {
         ThePrinter thePrinter = thePrinterManager_.getObject(printerTarget);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         try {
             thePrinter.getPrinterSetting(timeout, type);
@@ -520,80 +598,85 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     }
 
     @ReactMethod
-    public void printBuffer(ReadableArray printBuffer, final String target, final ReadableMap paramsMap, Promise promise) {
+    public void printBuffer(ReadableArray printBuffer, final String target, final ReadableMap paramsMap,
+            Promise promise) {
         tasksQueue.submit(new Runnable() {
-        @Override
-        public void run() {
-            printFromBuffer(printBuffer, target, paramsMap, new MyCallbackInterface() {
             @Override
-            public void onSuccess(String result) {
-                promise.resolve(result);
-            }
+            public void run() {
+                printFromBuffer(printBuffer, target, paramsMap, new MyCallbackInterface() {
+                    @Override
+                    public void onSuccess(String result) {
+                        promise.resolve(result);
+                    }
 
-            @Override
-            public void onError(String result) {
-                promise.reject(result);
+                    @Override
+                    public void onError(String result) {
+                        promise.reject(result);
+                    }
+                });
             }
-            });
-        }
         });
     }
 
-    public void printFromBuffer(ReadableArray printBuffer, final String target, final ReadableMap paramsMap, MyCallbackInterface callback) {
+    public void printFromBuffer(ReadableArray printBuffer, final String target, final ReadableMap paramsMap,
+            MyCallbackInterface callback) {
         try {
-          ThePrinter thePrinter = thePrinterManager_.getObject(target);
-          if (thePrinter == null) {
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
-            callback.onError(errorString);
-            return;
-          }
-
-          Printer printer = thePrinter.getEpos2Printer();
-          if (printer == null) {
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
-            callback.onError(errorString);
-            return;
-          }
-
-          try {
-            printer.clearCommandBuffer();
-            int bufferLength = printBuffer.size();
-            for (int curr = 0; curr < bufferLength; curr++) {
-              ReadableArray command = printBuffer.getArray(curr);
-              handleCommand(command.getInt(0), command.getArray(1), target);
+            ThePrinter thePrinter = thePrinterManager_.getObject(target);
+            if (thePrinter == null) {
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
+                callback.onError(errorString);
+                return;
             }
-          } catch (Epos2Exception e) {
-            printer.clearCommandBuffer();
-            int status = EscPosPrinterErrorManager.getErrorStatus(e);
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(status);
-            callback.onError(errorString);
-            return;
-          } catch (IOException e) {
-            printer.clearCommandBuffer();
-            callback.onError(e.getMessage());
-            return;
-          }
 
-          try {
-            this.printData(paramsMap, target);
-            String successString = EscPosPrinterErrorManager.getCodeText(Epos2CallbackCode.CODE_SUCCESS);
-            callback.onSuccess(successString);
-          } catch (Epos2Exception e) {
-            int status = EscPosPrinterErrorManager.getErrorStatus(e);
-            String errorString = EscPosPrinterErrorManager.getEposExceptionText(status);
-            callback.onError(errorString);
-          }
+            Printer printer = thePrinter.getEpos2Printer();
+            if (printer == null) {
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(Epos2Exception.ERR_MEMORY);
+                callback.onError(errorString);
+                return;
+            }
+
+            try {
+                printer.clearCommandBuffer();
+                int bufferLength = printBuffer.size();
+                for (int curr = 0; curr < bufferLength; curr++) {
+                    ReadableArray command = printBuffer.getArray(curr);
+                    handleCommand(command.getInt(0), command.getArray(1), target);
+                }
+            } catch (Epos2Exception e) {
+                printer.clearCommandBuffer();
+                int status = EscPosPrinterErrorManager.getErrorStatus(e);
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(status);
+                callback.onError(errorString);
+                return;
+            } catch (IOException e) {
+                printer.clearCommandBuffer();
+                callback.onError(e.getMessage());
+                return;
+            }
+
+            try {
+                this.printData(paramsMap, target);
+                String successString = EscPosPrinterErrorManager.getCodeText(Epos2CallbackCode.CODE_SUCCESS);
+                callback.onSuccess(successString);
+            } catch (Epos2Exception e) {
+                int status = EscPosPrinterErrorManager.getErrorStatus(e);
+                String errorString = EscPosPrinterErrorManager.getEposExceptionText(status);
+                callback.onError(errorString);
+            }
 
         } catch (Exception e) {
-          callback.onError(e.getMessage());
+            callback.onError(e.getMessage());
         }
-  }
+    }
+
     synchronized public int sendData(@NonNull final String objectid, int timeout) {
         ThePrinter thePrinter = thePrinterManager_.getObject(objectid);
-        if (thePrinter == null) return Epos2Exception.ERR_MEMORY;
+        if (thePrinter == null)
+            return Epos2Exception.ERR_MEMORY;
 
         Printer printer = thePrinter.getEpos2Printer();
-        if (printer == null) return Epos2Exception.ERR_MEMORY;
+        if (printer == null)
+            return Epos2Exception.ERR_MEMORY;
 
         thePrinter.setBusy(ThePrinterState.PRINTER_PRINTING);
 
@@ -611,13 +694,14 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     // region PrinterDelegate
 
-
     /**
-     Returns void
-     Function onPrinterStartStatusMonitorResult informs that Start Status monitor has been successfull/failed.
-     @param printerTarget String the printer target
-     @param hasError boolean if the status has failed will be false
-     @param error String contains why start failed
+     * Returns void
+     * Function onPrinterStartStatusMonitorResult informs that Start Status monitor
+     * has been successfull/failed.
+     * 
+     * @param printerTarget String the printer target
+     * @param hasError      boolean if the status has failed will be false
+     * @param error         String contains why start failed
      */
     @Override
     public void onPrinterStartStatusMonitorResult(@NonNull String printerTarget, boolean hasError, String error) {
@@ -625,11 +709,13 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     }
 
     /**
-     Returns void
-     Function onPrinterStopStatusMonitorResult informs that Stop Status monitor has been successful/failed.
-     @param printerTarget String the object hash key
-     @param hasError boolean if the status has failed will be false
-     @param error String contains why stop failed
+     * Returns void
+     * Function onPrinterStopStatusMonitorResult informs that Stop Status monitor
+     * has been successful/failed.
+     * 
+     * @param printerTarget String the object hash key
+     * @param hasError      boolean if the status has failed will be false
+     * @param error         String contains why stop failed
      */
     @Override
     public void onPrinterStopStatusMonitorResult(@NonNull String printerTarget, boolean hasError, String error) {
@@ -637,51 +723,61 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
     }
 
     /**
-     Returns void
-     Function onPrinterStatusChange informs the UI that the printer status has changed
-     @param printerTarget String the printer target
-     @param status int new status
+     * Returns void
+     * Function onPrinterStatusChange informs the UI that the printer status has
+     * changed
+     * 
+     * @param printerTarget String the printer target
+     * @param status        int new status
      */
     @Override
     public void onPrinterStatusChange(@NonNull String printerTarget, int status) {
 
-        new Thread (() -> {
+        new Thread(() -> {
             synchronized (delegateSync_) {
-                if (delegate_ != null) delegate_.onPrinterStatusChange(printerTarget, status);
+                if (delegate_ != null)
+                    delegate_.onPrinterStatusChange(printerTarget, status);
             }
         }).start();
     }
 
     /**
-     Returns void
-     Function onGetPrinterSetting informs the UI of the printer settings that where requested
-     @param printerTarget String the printer target
-     @param code int ePOS result
-     @param type int ePOS Settings Type -- EPOS2_PRINTER_SETTING_PAPERWIDTH
-     @param value int ePOS value -- Printer.SETTING_PAPERWIDTH_58_0
+     * Returns void
+     * Function onGetPrinterSetting informs the UI of the printer settings that
+     * where requested
+     * 
+     * @param printerTarget String the printer target
+     * @param code          int ePOS result
+     * @param type          int ePOS Settings Type --
+     *                      EPOS2_PRINTER_SETTING_PAPERWIDTH
+     * @param value         int ePOS value -- Printer.SETTING_PAPERWIDTH_58_0
      */
     @Override
     public void onGetPrinterSetting(@NonNull String printerTarget, int code, int type, int value) {
 
-        new Thread (() -> {
+        new Thread(() -> {
             synchronized (delegateSync_) {
-                if (delegate_ != null) delegate_.onGetPrinterSetting(printerTarget, code, type, value);
+                if (delegate_ != null)
+                    delegate_.onGetPrinterSetting(printerTarget, code, type, value);
             }
         }).start();
 
     }
 
     /**
-     Returns void
-     Function onPtrReceive informs the UI of the status of the print job that was received
-     @param printerTarget String the printer target
-     @param data JSONObject storing the result
+     * Returns void
+     * Function onPtrReceive informs the UI of the status of the print job that was
+     * received
+     * 
+     * @param printerTarget String the printer target
+     * @param data          JSONObject storing the result
      */
     @Override
     public void onPtrReceive(@NonNull String printerTarget, @NonNull JSONObject data) {
-        new Thread (() -> {
+        new Thread(() -> {
             synchronized (delegateSync_) {
-                if (delegate_ != null) delegate_.onPtrReceive(printerTarget, data);
+                if (delegate_ != null)
+                    delegate_.onPtrReceive(printerTarget, data);
             }
         }).start();
     }
@@ -712,6 +808,12 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             case PrintingCommands.COMMAND_ADD_ALIGN:
                 printer.addTextAlign(params.getInt(0));
                 break;
+            case PrintingCommands.COMMAND_ADD_TEXT_FONT:
+                printer.addTextFont(params.getInt(0));
+                break;
+            case PrintingCommands.COMMAND_ADD_LINE_SPACE:
+                printer.addLineSpace(params.getInt(0));
+                break;
 
             case PrintingCommands.COMMAND_ADD_IMAGE:
                 ReadableMap source = params.getMap(0);
@@ -724,7 +826,7 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
                 Bitmap imgBitmap = getBitmapFromSource(source);
                 handlePrintImage(imgBitmap, imgWidth, color, mode, halftone, brightness, printer);
 
-            break;
+                break;
             case PrintingCommands.COMMAND_ADD_IMAGE_BASE_64:
                 String uriString = params.getString(0);
                 final String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
@@ -732,7 +834,8 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                 int inputWidth = params.getInt(1);
 
-                handlePrintImage(bitmap, inputWidth, Printer.COLOR_1, Printer.MODE_MONO, Printer.HALFTONE_DITHER, Printer.PARAM_DEFAULT, printer);
+                handlePrintImage(bitmap, inputWidth, Printer.COLOR_1, Printer.MODE_MONO, Printer.HALFTONE_DITHER,
+                        Printer.PARAM_DEFAULT, printer);
                 break;
 
             case PrintingCommands.COMMAND_ADD_IMAGE_ASSET:
@@ -743,7 +846,8 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
                 InputStream inputStream = assetManager.open(params.getString(0));
                 Bitmap assetBitmap = BitmapFactory.decodeStream(inputStream);
                 inputStream.close();
-                handlePrintImage(assetBitmap, width, Printer.COLOR_1, Printer.MODE_MONO, Printer.HALFTONE_DITHER, Printer.PARAM_DEFAULT, printer);
+                handlePrintImage(assetBitmap, width, Printer.COLOR_1, Printer.MODE_MONO, Printer.HALFTONE_DITHER,
+                        Printer.PARAM_DEFAULT, printer);
                 break;
             case PrintingCommands.COMMAND_ADD_CUT:
                 printer.addCut(Printer.CUT_FEED);
@@ -757,39 +861,41 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
                 printer.addTextSmooth(params.getInt(0));
                 break;
             case PrintingCommands.COMMAND_ADD_BARCODE:
-                printer.addBarcode(params.getString(0), params.getInt(1), params.getInt(2), Printer.FONT_A, params.getInt(3), params.getInt(4));
+                printer.addBarcode(params.getString(0), params.getInt(1), params.getInt(2), Printer.FONT_A,
+                        params.getInt(3), params.getInt(4));
                 break;
             case PrintingCommands.COMMAND_ADD_QRCODE:
-                printer.addSymbol(params.getString(0), params.getInt(1), params.getInt(2), params.getInt(3), params.getInt(3), params.getInt(3));
+                printer.addSymbol(params.getString(0), params.getInt(1), params.getInt(2), params.getInt(3),
+                        params.getInt(3), params.getInt(3));
                 break;
             default:
                 throw new IllegalArgumentException("Invalid Printing Command");
         }
-  }
+    }
 
-  private void handlePrintImage(Bitmap bitmap, int width, int color, int mode, int halftone, double brightness, Printer printer) throws Epos2Exception {
-    float aspectRatio = bitmap.getWidth() / (float) bitmap.getHeight();
-    int newHeight = Math.round(width / aspectRatio);
-    bitmap = Bitmap.createScaledBitmap(bitmap, width, newHeight, false);
+    private void handlePrintImage(Bitmap bitmap, int width, int color, int mode, int halftone, double brightness,
+            Printer printer) throws Epos2Exception {
+        float aspectRatio = bitmap.getWidth() / (float) bitmap.getHeight();
+        int newHeight = Math.round(width / aspectRatio);
+        bitmap = Bitmap.createScaledBitmap(bitmap, width, newHeight, false);
 
-    printer.addImage(
-      bitmap,
-      0,
-      0,
-      width,
-      newHeight,
-      color,
-      mode,
-      halftone,
-      brightness,
-      Printer.COMPRESS_AUTO
-    );
-  }
+        printer.addImage(
+                bitmap,
+                0,
+                0,
+                width,
+                newHeight,
+                color,
+                mode,
+                halftone,
+                brightness,
+                Printer.COMPRESS_AUTO);
+    }
 
     private Bitmap getBitmapFromSource(ReadableMap source) throws Exception {
         String uriString = source.getString("uri");
 
-        if(uriString.startsWith("data")) {
+        if (uriString.startsWith("data")) {
             final String pureBase64Encoded = uriString.substring(uriString.indexOf(",") + 1);
             byte[] decodedString = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
             Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -797,13 +903,13 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
             return image;
         }
 
-        if(uriString.startsWith("http") || uriString.startsWith("https")) {
+        if (uriString.startsWith("http") || uriString.startsWith("https")) {
             URL url = new URL(uriString);
             Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             return image;
         }
 
-        if(uriString.startsWith("file")) {
+        if (uriString.startsWith("file")) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap image = BitmapFactory.decodeFile(uriString, options);
@@ -819,7 +925,7 @@ public class ThePrinterWrapper extends ReactContextBaseJavaModule implements Pri
 
     private void printData(final ReadableMap paramsMap, final String target) throws Epos2Exception {
         int timeout = Printer.PARAM_DEFAULT;
-        if(paramsMap != null && paramsMap.hasKey("timeout")) {
+        if (paramsMap != null && paramsMap.hasKey("timeout")) {
             timeout = paramsMap.getInt("timeout");
         }
         Printer printer = thePrinterManager_.getObject(target).getEpos2Printer();
