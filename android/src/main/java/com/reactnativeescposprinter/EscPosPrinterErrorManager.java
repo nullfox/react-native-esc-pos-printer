@@ -476,6 +476,7 @@ public class EscPosPrinterErrorManager {
         statusMessage.putString("adapter", adapter);
         statusMessage.putString("batteryLevel", batteryLevel);
         statusMessage.putString("paperWait", paperWait);
+        statusMessage.putString("removalWaiting", String.valueOf(statusInfo.getRemovalWaiting()));
 
         return statusMessage;
     }
