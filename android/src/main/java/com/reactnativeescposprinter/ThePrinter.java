@@ -1,5 +1,7 @@
 package com.reactnativeescposprinter;
 
+import android.util.Log;
+
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterSettingListener;

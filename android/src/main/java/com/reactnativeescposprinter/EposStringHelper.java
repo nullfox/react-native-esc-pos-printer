@@ -1,5 +1,7 @@
 package com.reactnativeescposprinter;
 
+import android.util.Log;
+
 import static com.reactnativeescposprinter.ePOSCmd.POS_SUCCESS;
 
 import android.content.Context;
