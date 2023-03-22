@@ -1,6 +1,8 @@
 package com.reactnativeescposprinter;
 
 import android.util.Log;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import static com.reactnativeescposprinter.ePOSCmd.POS_SUCCESS;
 
@@ -247,9 +249,11 @@ public class EposStringHelper {
                 break;
         }
 
-        Log.d("RNEscPosPrinter", String.valueOf(statusInfo.getRemovalWaiting()));
-        Log.d("RNEscPosPrinter", String.valueOf(Printer.REMOVAL_WAIT_PAPER));
-        Log.d("RNEscPosPrinter", String.valueOf(Printer.REMOVAL_WAIT_NONE));
+        Logger logger = Logger.getLogger("com.reactnativeescpostprinter.EposStringHelper");
+
+        logger.log(Level.ALL, String.valueOf(statusInfo.getRemovalWaiting()));
+        logger.log(Level.ALL, String.valueOf(Printer.REMOVAL_WAIT_PAPER));
+        logger.log(Level.ALL, String.valueOf(Printer.REMOVAL_WAIT_NONE));
 
         JSONObject jsonStatus = new JSONObject();
         try {
