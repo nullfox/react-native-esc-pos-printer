@@ -445,8 +445,14 @@ public class EscPosPrinterErrorManager {
         }
 
         switch (statusInfo.getRemovalWaiting()) {
+            case Printer.EVENT_REMOVAL_WAIT_PAPER:
+                paperWait = "WAITING_FOR_PAPER_REMOVAL";
+                break;
             case Printer.REMOVAL_WAIT_PAPER:
                 paperWait = "WAITING_FOR_PAPER_REMOVAL";
+                break;
+            case Printer.EVENT_REMOVAL_WAIT_NONE:
+                paperWait = "NOT_WAITING_FOR_PAPER_REMOVAL";
                 break;
             case Printer.REMOVAL_WAIT_NONE:
                 paperWait = "NOT_WAITING_FOR_PAPER_REMOVAL";
