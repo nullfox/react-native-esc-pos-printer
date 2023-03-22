@@ -51,7 +51,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * Returns void
      * function initWith Will create a new printer with settings given
-     * 
+     *
      * @param printerTarget the target for the printer -- deviceInfo.target
      * @param series        the printer series -- EPOS2_TM_M30II
      * @param lang          the printer language -- EPOS2_MODEL_ANK
@@ -73,7 +73,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * Returns String
      * Function getPrinterTarget retrieves the printer target set from initWith.
-     * 
+     *
      * @return String containing printer target
      */
     public String getPrinterTarget() {
@@ -83,7 +83,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * Returns void
      * Function setBusy set the busy state of the printer
-     * 
+     *
      * @param busy set ThePrinterState
      *             *
      */
@@ -114,7 +114,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * Returns BOOL
      * Function isConnected uses getStatus to understand if it is connected or not.
-     * 
+     *
      * @return bool -- returns true if connected
      */
     synchronized public boolean isConnected() {
@@ -138,7 +138,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
      * Returns void
      * Function shutdown disconnects printer and sets flag to shutdown. Used when
      * tring to remove object
-     * 
+     *
      * @param closeConnection boolean set to disconnect printer
      */
     public void shutdown(boolean closeConnection) {
@@ -170,7 +170,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * Returns bool
      * Function isPrinterBusy returns if printer is busy doing a long operation
-     * 
+     *
      * @return bool YES == printer is busy
      */
     synchronized public boolean isPrinterBusy() {
@@ -217,7 +217,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
     /**
      * throws Epos2Exception if there is an error
      * Function connect tries to connect selected printer
-     * 
+     *
      * @param timeout      the amount of time before giving up --
      *                     EPOS2_PARAM_DEFAULT
      * @param startMonitor to Start the realtime statusMonitor
@@ -574,7 +574,7 @@ public class ThePrinter implements StatusChangeListener, PrinterSettingListener,
             printJobId = "";
         }
 
-        Log.e("MYAPP", status);
+        Log.e("MYAPP", status.getRemovalWaiting());
 
         // store result of printing
         JSONObject returnData = new JSONObject();

@@ -241,7 +241,7 @@ public class EposStringHelper {
                 break;
         }
 
-        Log.e("MYAPP", "exception", statusInfo.getRemovalWaiting());
+        Log.e("MYAPP", statusInfo.getRemovalWaiting());
 
         JSONObject jsonStatus = new JSONObject();
         try {
