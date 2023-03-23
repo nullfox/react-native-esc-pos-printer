@@ -37,7 +37,7 @@ import {
 } from './utils';
 
 const { EscPosPrinter, ThePrinterWrapper } = NativeModules;
-const printEventEmmiter = new NativeEventEmitter(EscPosPrinter);
+const printEventEmmiter = new NativeEventEmitter();
 
 type TCommandValue = [string, any[]];
 type TScalingFactors = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;

@@ -33,8 +33,8 @@ const {
   ThePrinterWrapper,
 } = NativeModules;
 
-const discoveryEventEmmiter = new NativeEventEmitter(EscPosPrinterDiscovery);
-const printEventEmmiter = new NativeEventEmitter(EscPosPrinter);
+const discoveryEventEmmiter = new NativeEventEmitter();
+const printEventEmmiter = new NativeEventEmitter();
 import printing from './printing';
 
 const _default = {

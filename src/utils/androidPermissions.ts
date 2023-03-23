@@ -6,7 +6,7 @@ import {
   EmitterSubscription,
 } from 'react-native';
 const { EscPosPrinterDiscovery } = NativeModules;
-const discoveryEventEmmiter = new NativeEventEmitter(EscPosPrinterDiscovery);
+const discoveryEventEmmiter = new NativeEventEmitter();
 
 export async function requestAndroidPermissions() {
   const permission =
